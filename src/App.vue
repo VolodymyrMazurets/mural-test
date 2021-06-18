@@ -1,28 +1,35 @@
 <template>
-  <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div class="test-app">
+    <avatar-component
+      indicatorStyle="bulge"
+      avatar="https://i.pravatar.cc/50"
+    />
+    <avatar-component indicatorStyle="dot" color="#eb7d7f" webcam />
+    <avatar-component indicatorStyle="arrow" color="#f6dc4a" />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import AvatarComponent from "./components/AvatarComponent/AvatarComponent.vue";
 
 export default {
-  name: 'App',
+  name: "App",
   components: {
-    HelloWorld
-  }
-}
+    AvatarComponent,
+  },
+};
 </script>
 
 <style lang="scss">
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+body {
+  font-size: 100%;
+}
+.test-app {
+  padding: 24px;
 }
 </style>
