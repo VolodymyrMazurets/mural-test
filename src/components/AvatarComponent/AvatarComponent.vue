@@ -125,7 +125,6 @@ export default {
       this.deviceId = id;
     },
     devices() {
-      // Once we have a list select the first one
       const [first] = this.devices;
       if (first) {
         this.camera = first.deviceId;

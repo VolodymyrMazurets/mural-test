@@ -3,18 +3,18 @@
     <avatar-component
       indicatorStyle="bulge"
       avatar="https://i.pravatar.cc/50"
-      :radialPosition="-45"
+      :radialPosition="firstAngle"
     />
     <avatar-component
       indicatorStyle="dot"
       color="#eb7d7f"
       webcam
-      :radialPosition="45"
+      :radialPosition="secondAngle"
     />
     <avatar-component
       indicatorStyle="arrow"
       color="#f6dc4a"
-      :radialPosition="230"
+      :radialPosition="thirdAngle"
     />
     <avatar-component
       :media="media"
@@ -37,6 +37,9 @@ export default {
   data() {
     return {
       media: null,
+      firstAngle: -45,
+      secondAngle: 0,
+      thirdAngle: 235,
     };
   },
   mounted() {
@@ -44,6 +47,11 @@ export default {
     navigator.mediaDevices.getUserMedia(constraints).then((media) => {
       this.media = media;
     });
+    setInterval(() => {
+      this.firstAngle += 10;
+      this.secondAngle -= 10;
+      this.thirdAngle += 10;
+    }, [1000]);
   },
 };
 </script>
