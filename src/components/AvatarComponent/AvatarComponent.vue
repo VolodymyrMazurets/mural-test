@@ -18,21 +18,37 @@
       />
       <shrimp-icon v-else class="AvatarComponent__icon" />
     </div>
-    <arrow-avatar-component
-      v-if="getIndicatorType('arrow')"
-      class="AvatarComponent__arrow"
-      :radialPosition="-45"
-    />
-    <dot-avatar-component
-      v-if="getIndicatorType('dot')"
-      class="AvatarComponent__arrow"
-      :radialPosition="235"
-    />
-    <bulge-avatar-component
-      v-if="getIndicatorType('bulge')"
-      class="AvatarComponent__arrow"
-      :radialPosition="45"
-    />
+    <template v-if="!isSound">
+      <arrow-avatar-component
+        v-if="getIndicatorType('arrow')"
+        class="AvatarComponent__arrow"
+        :radialPosition="radialPosition"
+      />
+      <dot-avatar-component
+        v-if="getIndicatorType('dot')"
+        class="AvatarComponent__arrow"
+        :radialPosition="radialPosition"
+      />
+      <bulge-avatar-component
+        v-if="getIndicatorType('bulge')"
+        class="AvatarComponent__arrow"
+        :radialPosition="radialPosition"
+      />
+    </template>
+    <template v-else>
+      <audio-component
+        ref="shlyapa"
+        canvFillColor="red"
+        :media="media"
+        connect-destination
+        :radius="25"
+        :canvWidth="80"
+        :canvHeight="80"
+        :lineColor="color"
+        :lineWidth="2"
+        canvClass="AvatarComponent__canvas"
+      ></audio-component>
+    </template>
   </div>
 </template>
 <script>
@@ -41,6 +57,7 @@ import BulgeAvatarComponent from "../common/BulgeAvatarComponent/BulgeAvatarComp
 import DotAvatarComponent from "../common/DotAvatarComponent/DotAvatarComponent.vue";
 import ShrimpIcon from "../icons/ShrimpIcon.vue";
 import { WebCam } from "vue-web-cam";
+import AudioComponent from '../common/AudioComponent/AudioComponent';
 
 export default {
   components: {
@@ -49,6 +66,7 @@ export default {
     BulgeAvatarComponent,
     ShrimpIcon,
     WebCam,
+    AudioComponent,
   },
   name: "AvatarComponent",
   props: {
@@ -66,6 +84,16 @@ export default {
     },
     webcam: {
       type: Boolean,
+    },
+    radialPosition: {
+      type: Number,
+      default: 0,
+    },
+    isSound: {
+      type: Boolean,
+    },
+    media: {
+      type: MediaStream,
     },
   },
   data() {
@@ -87,8 +115,10 @@ export default {
     },
     onCameras(cameras) {
       this.devices = cameras;
-      console.log("On Cameras Event", cameras);
     },
+  },
+  mounted() {
+      console.log(this.$refs)
   },
   watch: {
     camera(id) {
@@ -137,6 +167,15 @@ $offset: 8px;
   }
   &__icon {
     width: 50%;
+  }
+  &__canvas {
+    position: absolute;
+    left: -15px;
+    right: -15px;
+    bottom: -15px;
+    top: -15px;
+    border-radius: 50%;
+    overflow: hidden;
   }
 }
 </style>
