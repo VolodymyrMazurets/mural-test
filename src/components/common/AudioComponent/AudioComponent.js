@@ -71,7 +71,7 @@ const AudioComponent = {
     this.createCanvas();
   },
   watch: {
-    media(newVal) {
+    async media(newVal) {
       if (newVal) this.setAnalyser();
       this.draw();
     },
@@ -86,8 +86,8 @@ const AudioComponent = {
       this.$el.appendChild(canv);
     },
     setAnalyser() {
-      this.audioCtx = this.audioCtx || new AudioContext();
-      this.analyser = this.analyser || this.audioCtx.createAnalyser();
+      this.audioCtx = new AudioContext();
+      this.analyser = this.audioCtx.createAnalyser();
       const src = this.audioCtx.createMediaStreamSource(this.media);
       src.connect(this.analyser);
       if (this.fftSize) {

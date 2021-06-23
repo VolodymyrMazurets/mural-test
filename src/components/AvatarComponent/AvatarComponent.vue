@@ -1,20 +1,24 @@
 <template>
   <div class="AvatarComponent" :style="{ color: color }">
     <div class="AvatarComponent__image-wrapper">
-      <img
-        :src="avatar"
-        alt="user"
-        v-if="avatar"
-        class="AvatarComponent__image"
-      />
       <web-cam
         class="AvatarComponent__webcam"
         ref="webcam"
         :device-id="deviceId"
         :width="56"
+        :height="56"
         :style="{ borderRadius: '50%' }"
         @cameras="onCameras"
-        v-else-if="webcam"
+        @camera-change="onCameraChange"
+        v-if="webcam"
+        @stopped="stoped"
+        @started="started"
+      />
+      <img
+        :src="avatar"
+        alt="user"
+        v-if="avatar && !webcam"
+        class="AvatarComponent__image"
       />
       <shrimp-icon v-else class="AvatarComponent__icon" />
     </div>
@@ -22,14 +26,17 @@
       <arrow-avatar-component
         v-if="getIndicatorType('arrow')"
         class="AvatarComponent__arrow"
+        :color="color"
         :radialPosition="radialPosition"
       />
       <dot-avatar-component
         v-if="getIndicatorType('dot')"
         class="AvatarComponent__arrow"
+        :color="color"
         :radialPosition="radialPosition"
       />
       <bulge-avatar-component
+        :color="color"
         v-if="getIndicatorType('bulge')"
         class="AvatarComponent__arrow"
         :radialPosition="radialPosition"
@@ -37,8 +44,7 @@
     </template>
     <template v-else>
       <audio-component
-        ref="shlyapa"
-        canvFillColor="red"
+        v-if="!isMute"
         :media="media"
         connect-destination
         :radius="25"
@@ -48,6 +54,9 @@
         :lineWidth="2"
         canvClass="AvatarComponent__canvas"
       ></audio-component>
+      <div v-else class="AvatarComponent__mute">
+        <mute-icon class="AvatarComponent__mute-icon" />
+      </div>
     </template>
   </div>
 </template>
@@ -57,7 +66,8 @@ import BulgeAvatarComponent from "../common/BulgeAvatarComponent/BulgeAvatarComp
 import DotAvatarComponent from "../common/DotAvatarComponent/DotAvatarComponent.vue";
 import ShrimpIcon from "../icons/ShrimpIcon.vue";
 import { WebCam } from "vue-web-cam";
-import AudioComponent from '../common/AudioComponent/AudioComponent';
+import AudioComponent from "../common/AudioComponent/AudioComponent";
+import MuteIcon from "../icons/MuteIcon.vue";
 
 export default {
   components: {
@@ -67,6 +77,7 @@ export default {
     ShrimpIcon,
     WebCam,
     AudioComponent,
+    MuteIcon,
   },
   name: "AvatarComponent",
   props: {
@@ -95,40 +106,42 @@ export default {
     media: {
       type: MediaStream,
     },
+    deviceId: {
+      type: String,
+    },
+    onCameras: {
+      type: Function,
+    },
+    onCameraChange: {
+      type: Function,
+    },
+    onError: {
+      type: Function,
+    },
+    isMute: {
+      type: Boolean,
+      default: false,
+    },
   },
   data() {
-    return {
-      img: null,
-      camera: null,
-      deviceId: null,
-      devices: [],
-    };
-  },
-  computed: {
-    device: function() {
-      return this.devices.find((n) => n.deviceId === this.deviceId);
-    },
+    return {};
   },
   methods: {
     getIndicatorType(type) {
       return this.indicatorStyle === type;
     },
-    onCameras(cameras) {
-      this.devices = cameras;
+    stoped(e) {
+      console.log("stoped", e);
     },
-  },
-  mounted() {
-      console.log(this.$refs)
+    started(e) {
+      console.log("started", e);
+    },
   },
   watch: {
-    camera(id) {
-      this.deviceId = id;
-    },
-    devices() {
-      const [first] = this.devices;
-      if (first) {
-        this.camera = first.deviceId;
-        this.deviceId = first.deviceId;
+    media() {
+      if (this.isSound) {
+        this.rerenderVar = false;
+        this.rerenderVar = true;
       }
     },
   },
@@ -175,6 +188,27 @@ $offset: 8px;
     top: -15px;
     border-radius: 50%;
     overflow: hidden;
+  }
+  &__webcam {
+    min-width: 56px;
+    height: 56px;
+  }
+  &__mute {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    width: 14px;
+    height: 14px;
+    background-color: red;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  &__mute-icon {
+    fill: white;
+    width: 10px;
   }
 }
 </style>
