@@ -14,6 +14,7 @@
     "lodash": "^4.17.21",
     "v-movable": "^0.3.2",
     "vue": "^2.6.11",
+    "vue-click-outside": "^1.1.0",
     "vue-web-cam": "^1.9.0",
     "vuex": "^3.4.0"
   },

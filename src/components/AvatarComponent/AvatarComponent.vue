@@ -1,5 +1,10 @@
 <template>
-  <div class="AvatarComponent" :style="{ color: color }">
+  <div
+    @contextmenu.prevent="openMenu"
+    class="AvatarComponent"
+    :style="{ color: color }"
+    ref="avatar"
+  >
     <div class="AvatarComponent__image-wrapper">
       <web-cam
         class="AvatarComponent__webcam"
@@ -58,6 +63,15 @@
         <mute-icon class="AvatarComponent__mute-icon" />
       </div>
     </template>
+    <radial-context-menu
+      class="AvatarComponent__radial-menu"
+      ref="radialMenu"
+      @clicked="menuClicked"
+      v-click-outside="closeMenu"
+      :menu-items="menuItems"
+      :size="100"
+      close-on-click
+    />
   </div>
 </template>
 <script>
@@ -68,6 +82,8 @@ import ShrimpIcon from "../icons/ShrimpIcon.vue";
 import { WebCam } from "vue-web-cam";
 import AudioComponent from "../common/AudioComponent/AudioComponent";
 import MuteIcon from "../icons/MuteIcon.vue";
+import RadialContextMenu from "../common/RadialContextMenu/RadialContextMenu.vue";
+import ClickOutside from "vue-click-outside";
 
 export default {
   components: {
@@ -78,6 +94,7 @@ export default {
     WebCam,
     AudioComponent,
     MuteIcon,
+    RadialContextMenu,
   },
   name: "AvatarComponent",
   props: {
@@ -124,7 +141,50 @@ export default {
     },
   },
   data() {
-    return {};
+    return {
+      menuItems: [
+        {
+          id: "walk",
+          title: "Walk",
+          icon: "#shrimb",
+        },
+        {
+          id: "run",
+          title: "Run",
+          icon: "#shrimb",
+        },
+        {
+          id: "drive",
+          title: "Drive",
+          icon: "#shrimb",
+        },
+        {
+          id: "figth",
+          title: "Fight",
+          icon: "#shrimb",
+        },
+        {
+          id: "walk1",
+          title: "Walk1",
+          icon: "#shrimb",
+        },
+        {
+          id: "run1",
+          title: "Run1",
+          icon: "#shrimb",
+        },
+        {
+          id: "drive1",
+          title: "Drive1",
+          icon: "#shrimb",
+        },
+        {
+          id: "figth1",
+          title: "Fight1",
+          icon: "#shrimb",
+        },
+      ],
+    };
   },
   methods: {
     getIndicatorType(type) {
@@ -136,6 +196,19 @@ export default {
     started(e) {
       console.log("started", e);
     },
+    click(e) {
+      e.preventDefault();
+      console.log(e);
+    },
+    menuClicked: function(menuItem) {
+      console.log("Menu item click:", menuItem.id);
+    },
+    openMenu: function() {
+      this.$refs.radialMenu.open();
+    },
+    closeMenu: function() {
+      this.$refs.radialMenu.close();
+    },
   },
   watch: {
     media() {
@@ -144,6 +217,9 @@ export default {
         this.rerenderVar = true;
       }
     },
+  },
+  directives: {
+    ClickOutside,
   },
 };
 </script>
@@ -209,6 +285,13 @@ $offset: 8px;
   &__mute-icon {
     fill: white;
     width: 10px;
+  }
+  &__radial-menu {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 2;
   }
 }
 </style>
