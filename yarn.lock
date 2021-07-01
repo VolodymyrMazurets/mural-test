@@ -4385,6 +4385,11 @@ graceful-fs@^4.1.11, graceful-fs@^4.1.15, graceful-fs@^4.1.2, graceful-fs@^4.1.6
   resolved "https://registry.npm.taobao.org/graceful-fs/download/graceful-fs-4.2.6.tgz#ff040b2b0853b23c3d31027523706f1885d76bee"
   integrity sha1-/wQLKwhTsjw9MQJ1I3BvGIXXa+4=
 
+gsap@^3.7.0:
+  version "3.7.0"
+  resolved "https://registry.yarnpkg.com/gsap/-/gsap-3.7.0.tgz#ebadf467898ddf25011030090f0399cb0e292309"
+  integrity sha512-8JI7pcFj0pgMzwqChARiHf7EIIZp1QrQBP74M2p2NpQLiAeIhQsrJWIRiwmA2JWkkNe0I2BiQF5ZhJvpyJVJDA==
+
 gzip-size@^5.0.0:
   version "5.1.1"
   resolved "https://registry.npm.taobao.org/gzip-size/download/gzip-size-5.1.1.tgz?cache=0&sync_timestamp=1605523224661&other_urls=https%3A%2F%2Fregistry.npm.taobao.org%2Fgzip-size%2Fdownload%2Fgzip-size-5.1.1.tgz#cb9bee692f87c0612b232840a873904e4c135274"
@@ -5433,6 +5438,11 @@ launch-editor@^2.2.1:
   dependencies:
     chalk "^2.3.0"
     shell-quote "^1.6.1"
+
+leader-line-vue@^2.1.1:
+  version "2.1.1"
+  resolved "https://registry.yarnpkg.com/leader-line-vue/-/leader-line-vue-2.1.1.tgz#738ff22bd80a62a694840fd7358f936ceb3ad898"
+  integrity sha512-ZfNoDcwgfHESNLErfPBdJ4I/1tbXLBUFwGfbqAZvTcOghcm7UtUm7mUPZVAOThlO3q75n8pZmDTGtM/Gwfx+xA==
 
 less@^3.9.0:
   version "3.13.1"
@@ -6653,6 +6663,11 @@ pkg-dir@^4.1.0:
   integrity sha1-8JkTPfft5CLoHR2ESCcO6z5CYfM=
   dependencies:
     find-up "^4.0.0"
+
+plain-draggable@^2.5.14:
+  version "2.5.14"
+  resolved "https://registry.yarnpkg.com/plain-draggable/-/plain-draggable-2.5.14.tgz#5a93a076c9b12f78d5fec077b60a47b28e2bb2c4"
+  integrity sha512-jJUkj/2lQm6Z3vkbPCYIDiDiOG5aXic18OPld8o+hJ+ZDcuODVX1mKnRoePDugP+/KO/v9FALuQd+rhr+LLJ5w==
 
 pnp-webpack-plugin@^1.6.4:
   version "1.6.4"

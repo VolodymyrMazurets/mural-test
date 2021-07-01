@@ -2,7 +2,7 @@
   <span
     :style="{
       background: `linear-gradient(to left,${color}  50%, transparent 50%)`,
-      transform: `rotate(${radialPosition - 90}deg) translateX(9px)`,
+      transform: `rotate(${radialPosition}rad) translateX(9px)`,
     }"
   />
 </template>
@@ -26,7 +26,7 @@ $size: 50px;
 span {
   display: block;
   width: $size;
-  height: $size +4px;
+  height: $size + 4px;
   transition: transform 0.3s ease;
   border-radius: 0% 100% 100% 0% / 0% 50% 50% 0%;
   z-index: 1;

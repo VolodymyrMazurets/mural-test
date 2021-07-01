@@ -131,7 +131,7 @@ export default {
       angle: -45,
       isOpenIndicatorType: false,
       indicatorStyles: ["arrow", "dot", "bulge"],
-      selectedIndicator: "arrow",
+      selectedIndicator: "dot",
       camera: null,
       deviceId: null,
       devices: [],
@@ -220,6 +220,8 @@ export default {
     microphone(newId) {
       if (!isNull(newId)) this.turnOnMicrophones(newId);
     },
+  },
+  async mounted() {
   },
 };
 </script>

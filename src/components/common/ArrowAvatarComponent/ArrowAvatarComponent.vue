@@ -2,7 +2,7 @@
   <span
     :style="{
       borderLeftColor: color,
-      transform: `rotate(${radialPosition - 90}deg) translateX(32px)`
+      transform: `rotate(${radialPosition}rad) translateX(${offset}px)`
       }"
   />
 </template>
@@ -17,6 +17,10 @@ export default {
     radialPosition: {
       type: Number,
       default: 0,
+    },
+    offset: {
+      type: Number,
+      default: 32,
     },
   },
 };

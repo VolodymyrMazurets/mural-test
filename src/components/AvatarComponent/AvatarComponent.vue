@@ -1,11 +1,10 @@
 <template>
-  <div
-    @contextmenu.prevent="openMenu"
-    class="AvatarComponent"
-    :style="{ color: color }"
-    ref="avatar"
-  >
-    <div class="AvatarComponent__image-wrapper">
+  <div class="AvatarComponent" :style="{ color: color }" ref="avatar">
+    <div
+      ref="avatarWrapper"
+      class="AvatarComponent__image-wrapper"
+      @contextmenu.prevent="openMenu"
+    >
       <web-cam
         class="AvatarComponent__webcam"
         ref="webcam"
@@ -27,26 +26,27 @@
       />
       <shrimp-icon v-else class="AvatarComponent__icon" />
     </div>
-    <template v-if="!isSound">
+    <movable v-if="!isSound" ref="arrow" @move="onMove">
       <arrow-avatar-component
         v-if="getIndicatorType('arrow')"
         class="AvatarComponent__arrow"
         :color="color"
-        :radialPosition="radialPosition"
+        :radialPosition="angle"
+        :offset="this.offset"
       />
       <dot-avatar-component
         v-if="getIndicatorType('dot')"
         class="AvatarComponent__arrow"
         :color="color"
-        :radialPosition="radialPosition"
+        :radialPosition="angle"
       />
       <bulge-avatar-component
         :color="color"
         v-if="getIndicatorType('bulge')"
         class="AvatarComponent__arrow"
-        :radialPosition="radialPosition"
+        :radialPosition="angle"
       />
-    </template>
+    </movable>
     <template v-else>
       <audio-component
         v-if="!isMute"
@@ -84,6 +84,7 @@ import AudioComponent from "../common/AudioComponent/AudioComponent";
 import MuteIcon from "../icons/MuteIcon.vue";
 import RadialContextMenu from "../common/RadialContextMenu/RadialContextMenu.vue";
 import ClickOutside from "vue-click-outside";
+import LeaderLine from "leader-line-vue";
 
 export default {
   components: {
@@ -113,10 +114,10 @@ export default {
     webcam: {
       type: Boolean,
     },
-    radialPosition: {
-      type: Number,
-      default: 0,
-    },
+    // radialPosition: {
+    //   type: Number,
+    //   default: 0,
+    // },
     isSound: {
       type: Boolean,
     },
@@ -184,6 +185,9 @@ export default {
           icon: "#shrimb",
         },
       ],
+      angle: 0,
+      offset: 32,
+      line: null,
     };
   },
   methods: {
@@ -209,6 +213,25 @@ export default {
     closeMenu: function() {
       this.$refs.radialMenu.close();
     },
+    onMove() {
+      const { avatarWrapper, arrow } = this.$refs;
+      const rectAvatar = avatarWrapper.getBoundingClientRect();
+      const centerX = rectAvatar.x + rectAvatar.width / 2;
+      const centerY = rectAvatar.y + rectAvatar.bottom / 2;
+      const rectArrow = arrow.$children[0].$el.getBoundingClientRect();
+      const centerArrowX = rectArrow.x + rectArrow.width / 2;
+      const centerArrowY = rectArrow.y + rectArrow.bottom / 2;
+
+      const dx = centerArrowX - centerX;
+      const dy = centerArrowY - centerY;
+      const range = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+
+      range > 32 ? (this.offset = 0) : (this.offset = 32);
+
+      this.angle = Math.atan2(dy, dx);
+
+      this.line.position();
+    },
   },
   watch: {
     media() {
@@ -220,6 +243,19 @@ export default {
   },
   directives: {
     ClickOutside,
+  },
+  mounted() {
+    const { avatarWrapper, arrow } = this.$refs;
+    this.line = new LeaderLine.setLine(avatarWrapper, arrow.$children[0].$el, {
+      startPlug: "behind",
+      endPlug: "behind",
+      color: this.color,
+      size: 2,
+      startSocket: 'top',
+      // endSocket: 'bottom',
+      startSocketGravity: [0, 0],
+      endSocketGravity: [0, 0],
+    });
   },
 };
 </script>
@@ -251,7 +287,6 @@ $offset: 8px;
     object-fit: cover;
   }
   &__arrow {
-    position: absolute;
   }
   &__icon {
     width: 50%;
@@ -292,6 +327,9 @@ $offset: 8px;
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 2;
+  }
+  &__line {
+    position: absolute;
   }
 }
 </style>
