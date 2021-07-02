@@ -5,28 +5,30 @@
       class="AvatarComponent__image-wrapper"
       @contextmenu.prevent="openMenu"
     >
-      <web-cam
-        class="AvatarComponent__webcam"
-        ref="webcam"
-        :device-id="deviceId"
-        :width="56"
-        :height="56"
-        :style="{ borderRadius: '50%' }"
-        @cameras="onCameras"
-        @camera-change="onCameraChange"
-        v-if="webcam"
-        @stopped="stoped"
-        @started="started"
-      />
-      <img
-        :src="avatar"
-        alt="user"
-        v-if="avatar && !webcam"
-        class="AvatarComponent__image"
-      />
-      <shrimp-icon v-else class="AvatarComponent__icon" />
+      <div class="AvatarComponent__image-block">
+        <web-cam
+          class="AvatarComponent__webcam"
+          ref="webcam"
+          :device-id="deviceId"
+          :width="56"
+          :height="56"
+          :style="{ borderRadius: '50%' }"
+          @cameras="onCameras"
+          @camera-change="onCameraChange"
+          v-if="webcam"
+          @stopped="stoped"
+          @started="started"
+        />
+        <img
+          :src="avatar"
+          alt="user"
+          v-if="avatar && !webcam"
+          class="AvatarComponent__image"
+        />
+        <shrimp-icon v-else class="AvatarComponent__icon" />
+      </div>
     </div>
-    <movable v-if="!isSound" ref="arrow" @move="onMove">
+    <div ref="arrow">
       <arrow-avatar-component
         v-if="getIndicatorType('arrow')"
         class="AvatarComponent__arrow"
@@ -46,8 +48,8 @@
         class="AvatarComponent__arrow"
         :radialPosition="angle"
       />
-    </movable>
-    <template v-else>
+    </div>
+    <template v-if="isSound">
       <audio-component
         v-if="!isMute"
         :media="media"
@@ -84,7 +86,11 @@ import AudioComponent from "../common/AudioComponent/AudioComponent";
 import MuteIcon from "../icons/MuteIcon.vue";
 import RadialContextMenu from "../common/RadialContextMenu/RadialContextMenu.vue";
 import ClickOutside from "vue-click-outside";
-import LeaderLine from "leader-line-vue";
+// import LeaderLine from "leader-line-vue";
+import { gsap } from "gsap";
+import { Draggable } from "gsap/Draggable";
+
+gsap.registerPlugin(Draggable);
 
 export default {
   components: {
@@ -114,10 +120,6 @@ export default {
     webcam: {
       type: Boolean,
     },
-    // radialPosition: {
-    //   type: Number,
-    //   default: 0,
-    // },
     isSound: {
       type: Boolean,
     },
@@ -186,7 +188,7 @@ export default {
         },
       ],
       angle: 0,
-      offset: 32,
+      offset: 10,
       line: null,
     };
   },
@@ -213,12 +215,18 @@ export default {
     closeMenu: function() {
       this.$refs.radialMenu.close();
     },
-    onMove() {
-      const { avatarWrapper, arrow } = this.$refs;
-      const rectAvatar = avatarWrapper.getBoundingClientRect();
+    updatePath(firstRef, secondRef, lineRef, e) {
+      if (e.target.className === "AvatarComponent__arrow") {
+        gsap.to(firstRef, { duration: 1, x: e.layerX - 10, y: e.layerY - 10 });
+      }
+      if (e.target.className === "AvatarComponent__image") {
+        console.log("first");
+      }
+
+      const rectAvatar = firstRef.getBoundingClientRect();
       const centerX = rectAvatar.x + rectAvatar.width / 2;
       const centerY = rectAvatar.y + rectAvatar.bottom / 2;
-      const rectArrow = arrow.$children[0].$el.getBoundingClientRect();
+      const rectArrow = secondRef.getBoundingClientRect();
       const centerArrowX = rectArrow.x + rectArrow.width / 2;
       const centerArrowY = rectArrow.y + rectArrow.bottom / 2;
 
@@ -230,7 +238,6 @@ export default {
 
       this.angle = Math.atan2(dy, dx);
 
-      this.line.position();
     },
   },
   watch: {
@@ -245,17 +252,22 @@ export default {
     ClickOutside,
   },
   mounted() {
-    const { avatarWrapper, arrow } = this.$refs;
-    this.line = new LeaderLine.setLine(avatarWrapper, arrow.$children[0].$el, {
-      startPlug: "behind",
-      endPlug: "behind",
-      color: this.color,
-      size: 2,
-      startSocket: 'top',
-      // endSocket: 'bottom',
-      startSocketGravity: [0, 0],
-      endSocketGravity: [0, 0],
+    const { avatarWrapper, arrow, line } = this.$refs;
+
+    Draggable.create([avatarWrapper, arrow], {
+      onDrag: (e) => this.updatePath(avatarWrapper, arrow, line, e),
     });
+
+    // this.line = new LeaderLine.setLine(avatarWrapper, arrow, {
+    //   startPlug: "behind",
+    //   endPlug: "behind",
+    //   color: this.color,
+    //   size: 2,
+    //   startSocket: "top",
+    //   // endSocket: 'bottom',
+    //   startSocketGravity: [0, 0],
+    //   endSocketGravity: [0, 0],
+    // });
   },
 };
 </script>
@@ -263,30 +275,31 @@ export default {
 $size: 50px;
 $offset: 8px;
 .AvatarComponent {
-  background-color: currentColor;
-  width: $size;
-  height: $size;
-  border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   position: relative;
   &__image-wrapper {
-    width: $size - $offset;
-    height: $size - $offset;
+    background-color: currentColor;
+    width: $size;
+    height: $size;
     border-radius: 50%;
     overflow: hidden;
-    z-index: 2;
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
   }
+  &__image-block {
+    width: $size - $offset;
+    height: $size - $offset;
+    border-radius: 50%;
+    overflow: hidden;
+    z-index: 2;
+  }
   &__image {
     width: 100%;
     object-fit: cover;
-  }
-  &__arrow {
   }
   &__icon {
     width: 50%;
@@ -329,7 +342,14 @@ $offset: 8px;
     z-index: 2;
   }
   &__line {
-    position: absolute;
+    fill: none;
+    stroke: red;
+    stroke-width: 6;
+  }
+  &__svg {
+    position: fixed;
+    width: 100%;
+    height: 100%;
   }
 }
 </style>

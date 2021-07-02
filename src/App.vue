@@ -131,7 +131,7 @@ export default {
       angle: -45,
       isOpenIndicatorType: false,
       indicatorStyles: ["arrow", "dot", "bulge"],
-      selectedIndicator: "dot",
+      selectedIndicator: "arrow",
       camera: null,
       deviceId: null,
       devices: [],
