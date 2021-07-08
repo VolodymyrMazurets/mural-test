@@ -1,10 +1,20 @@
 <template>
   <div class="AvatarComponent" :style="{ color: color }" ref="avatar">
+    <radial-context-menu
+      class="AvatarComponent__radial-menu"
+      ref="radialMenu"
+      @clicked="menuClicked"
+      v-click-outside="closeMenu"
+      :menu-items="menuItems"
+      :size="100"
+      close-on-click
+    />
     <div
       ref="avatarWrapper"
       class="AvatarComponent__image-wrapper"
       @contextmenu.prevent="openMenu"
     >
+      <div class="AvatarComponent__connection" ref="connection" />
       <div class="AvatarComponent__image-block">
         <web-cam
           class="AvatarComponent__webcam"
@@ -65,15 +75,6 @@
         <mute-icon class="AvatarComponent__mute-icon" />
       </div>
     </template>
-    <radial-context-menu
-      class="AvatarComponent__radial-menu"
-      ref="radialMenu"
-      @clicked="menuClicked"
-      v-click-outside="closeMenu"
-      :menu-items="menuItems"
-      :size="100"
-      close-on-click
-    />
   </div>
 </template>
 <script>
@@ -86,7 +87,7 @@ import AudioComponent from "../common/AudioComponent/AudioComponent";
 import MuteIcon from "../icons/MuteIcon.vue";
 import RadialContextMenu from "../common/RadialContextMenu/RadialContextMenu.vue";
 import ClickOutside from "vue-click-outside";
-// import LeaderLine from "leader-line-vue";
+import LeaderLine from "leader-line-vue";
 import { gsap } from "gsap";
 import { Draggable } from "gsap/Draggable";
 
@@ -202,10 +203,6 @@ export default {
     started(e) {
       console.log("started", e);
     },
-    click(e) {
-      e.preventDefault();
-      console.log(e);
-    },
     menuClicked: function(menuItem) {
       console.log("Menu item click:", menuItem.id);
     },
@@ -217,11 +214,23 @@ export default {
     },
     updatePath(firstRef, secondRef, lineRef, e) {
       if (e.target.className === "AvatarComponent__arrow") {
-        gsap.to(firstRef, { duration: 1, x: e.layerX - 10, y: e.layerY - 10 });
+        gsap.to(firstRef, {
+          duration: 1,
+          x: e.layerX - 10,
+          y: e.layerY - 10,
+          onUpdate: () => this.line.position(),
+        });
       }
-      if (e.target.className === "AvatarComponent__image") {
-        console.log("first");
+      if (e.target.className === "AvatarComponent__image-block") {
+        gsap.to(secondRef, {
+          duration: 0,
+          x: e.layerX + 10,
+          y: e.layerY + 10,
+          onUpdate: () => this.line.position(),
+        });
       }
+
+      this.line.position();
 
       const rectAvatar = firstRef.getBoundingClientRect();
       const centerX = rectAvatar.x + rectAvatar.width / 2;
@@ -232,12 +241,15 @@ export default {
 
       const dx = centerArrowX - centerX;
       const dy = centerArrowY - centerY;
-      const range = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+      // const range = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
 
-      range > 32 ? (this.offset = 0) : (this.offset = 32);
+      // range > 32 ? (this.offset = 0) : (this.offset = 32);
 
       this.angle = Math.atan2(dy, dx);
-
+    },
+    onKeydown(e) {
+      if (e.key === "ArrowUp" || e.key === "w") this.angle += 1;
+      if (e.key === "ArrowDown" || e.key === "s") this.angle -= 1;
     },
   },
   watch: {
@@ -252,22 +264,27 @@ export default {
     ClickOutside,
   },
   mounted() {
-    const { avatarWrapper, arrow, line } = this.$refs;
+    const { avatarWrapper, arrow, line, connection } = this.$refs;
 
     Draggable.create([avatarWrapper, arrow], {
       onDrag: (e) => this.updatePath(avatarWrapper, arrow, line, e),
     });
 
-    // this.line = new LeaderLine.setLine(avatarWrapper, arrow, {
-    //   startPlug: "behind",
-    //   endPlug: "behind",
-    //   color: this.color,
-    //   size: 2,
-    //   startSocket: "top",
-    //   // endSocket: 'bottom',
-    //   startSocketGravity: [0, 0],
-    //   endSocketGravity: [0, 0],
-    // });
+    this.line = new LeaderLine.setLine(connection, arrow, {
+      startPlug: "behind",
+      endPlug: "behind",
+      color: this.color,
+      size: 2,
+      startSocket: "center",
+      endSocket: "center",
+      startSocketGravity: [0, 0],
+      endSocketGravity: [0, 0],
+      allowContextMenu: true,
+    });
+    document.addEventListener("keydown", this.onKeydown);
+  },
+  beforeDestroy() {
+    document.removeEventListener("keydown", this.onKeydown);
   },
 };
 </script>
@@ -279,6 +296,7 @@ $offset: 8px;
   align-items: center;
   justify-content: center;
   position: relative;
+  z-index: 1;
   &__image-wrapper {
     background-color: currentColor;
     width: $size;
@@ -300,6 +318,7 @@ $offset: 8px;
   &__image {
     width: 100%;
     object-fit: cover;
+    pointer-events: none;
   }
   &__icon {
     width: 50%;
@@ -351,5 +370,15 @@ $offset: 8px;
     width: 100%;
     height: 100%;
   }
+  &__connection {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+  }
+}
+.leader-line {
+  z-index: 0;
 }
 </style>
