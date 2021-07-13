@@ -1,19 +1,19 @@
 <template>
   <div class="AvatarComponent" :style="{ color: color }" ref="avatar">
-    <radial-context-menu
-      class="AvatarComponent__radial-menu"
-      ref="radialMenu"
-      @clicked="menuClicked"
-      v-click-outside="closeMenu"
-      :menu-items="menuItems"
-      :size="100"
-      close-on-click
-    />
     <div
       ref="avatarWrapper"
       class="AvatarComponent__image-wrapper"
       @contextmenu.prevent="openMenu"
     >
+      <radial-context-menu
+        class="AvatarComponent__radial-menu"
+        ref="radialMenu"
+        @clicked="menuClicked"
+        v-click-outside="closeMenu"
+        :menu-items="menuItems"
+        :size="100"
+        close-on-click
+      />
       <div class="AvatarComponent__connection" ref="connection" />
       <div class="AvatarComponent__image-block">
         <web-cam
@@ -241,10 +241,6 @@ export default {
 
       const dx = centerArrowX - centerX;
       const dy = centerArrowY - centerY;
-      // const range = Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-
-      // range > 32 ? (this.offset = 0) : (this.offset = 32);
-
       this.angle = Math.atan2(dy, dx);
     },
     onKeydown(e) {
@@ -268,6 +264,7 @@ export default {
 
     Draggable.create([avatarWrapper, arrow], {
       onDrag: (e) => this.updatePath(avatarWrapper, arrow, line, e),
+      allowContextMenu: true,
     });
 
     this.line = new LeaderLine.setLine(connection, arrow, {
@@ -302,7 +299,6 @@ $offset: 8px;
     width: $size;
     height: $size;
     border-radius: 50%;
-    overflow: hidden;
     position: relative;
     display: flex;
     justify-content: center;
